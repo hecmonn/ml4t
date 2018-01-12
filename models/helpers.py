@@ -1,15 +1,20 @@
 import pandas as pd
 import os
+from datetime import datetime
+
+
 def get_path(symbol):
     base_dir='data'
     return os.path.join(base_dir,'{}.csv'.format(str(symbol)))
-    
-def get_data(sd,ed,symbols):
+
+def get_data(sd,symbols='SPY'):
+    ed=datetime.now().strftime("%Y-%m-%d")
     range_dates=pd.date_range(sd,ed)
     df=pd.DataFrame(index=range_dates)
     dfs_symbols=[]
     for symbol in symbols:
         path=get_path(symbol)
+        print (path)
         df_symbol=pd.read_csv(path
                         ,index_col='Date'
                         ,parse_dates=True
@@ -32,14 +37,14 @@ def daily_returns(df, use_pandas=True):
     else:
         daily_returns = (df / df.shift(1)) - 1
     return daily_returns
-    
+
 def cumulative_returns(df, begin_date, end_date):
     if len(df) > 1:
         cumulative_returns = (df.ix[begin_date:end_date, :] / df.ix[0]) - 1
     else:
         cumulative_returns = (df.ix[begin_date:end_date] / df.ix[0]) - 1
     return cumulative_returns
-    
+
 def momentum(df,sd,ed):
     return (df[sd]/df[ed])-1
 
@@ -49,7 +54,7 @@ def bollinger_bands(df,sd,ed):
     std=df[sd:ed].std()
     bb=(df[sd:ed]-sma)/(2*std)
     return bb
-    
+
 def fill_data(df):
     df.fillna(method='bfill',inplace=True)
     df.fillna(method='ffill',inplace=True)
